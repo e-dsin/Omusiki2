@@ -1,0 +1,134 @@
+{
+  // Tâches Ô musiki — Terminal > Exécuter une tâche…  (Ctrl+Maj+B : « Tout démarrer »)
+  // Écrit pour Windows (PowerShell) ; les variantes macOS / Linux sont indiquées par "osx" / "linux".
+  "version": "2.0.0",
+  // Sous Windows, PowerShell sans profil et sans blocage des scripts (npm.ps1, npx.ps1)
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "powershell.exe",
+        "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "label": "Installation (première fois)",
+      "type": "shell",
+      "command": "./scripts/setup.ps1",
+      "osx": { "command": "bash scripts/setup.sh" },
+      "linux": { "command": "bash scripts/setup.sh" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Back-end : démarrer (API simulée)",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 3001 --reload",
+      "osx": { "command": ".venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 3001 --reload" },
+      "linux": { "command": ".venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 3001 --reload" },
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uvicorn",
+        "pattern": { "regexp": "^(ERROR):\\s+(.*)$", "severity": 1, "message": 2 },
+        "background": {
+          "beginsPattern": "Will watch for changes|Started reloader process|Started server process",
+          "endsPattern": "Application startup complete"
+        }
+      },
+      "presentation": { "group": "serveurs", "panel": "dedicated" }
+    },
+    {
+      "label": "Front : démarrer (mode api)",
+      "type": "shell",
+      "command": "npm run dev:api",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^(error)\\s+(.*)$", "severity": 1, "message": 2 },
+        "background": {
+          "beginsPattern": "VITE v|vite v",
+          "endsPattern": "Local:|ready in"
+        }
+      },
+      "presentation": { "group": "serveurs", "panel": "dedicated" }
+    },
+    {
+      "label": "Front : démarrer (mode démo, sans back-end)",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^(error)\\s+(.*)$", "severity": 1, "message": 2 },
+        "background": { "beginsPattern": "VITE v|vite v", "endsPattern": "Local:|ready in" }
+      },
+      "presentation": { "panel": "dedicated" }
+    },
+    {
+      "label": "Tout démarrer (back + front)",
+      "dependsOn": ["Back-end : démarrer (API simulée)", "Front : démarrer (mode api)"],
+      "dependsOrder": "parallel",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Back-end : tests (pytest)",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe -m pytest",
+      "osx": { "command": ".venv/bin/python -m pytest" },
+      "linux": { "command": ".venv/bin/python -m pytest" },
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "E2E : tests de bout en bout (Playwright)",
+      "detail": "Démarre back et front s'ils ne tournent pas déjà, puis joue les parcours L1 à L11",
+      "type": "shell",
+      "command": "npx playwright test",
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "E2E : rapport du dernier passage",
+      "type": "shell",
+      "command": "npx playwright show-report",
+      "problemMatcher": []
+    },
+    {
+      "label": "Base locale : réinitialiser",
+      "detail": "Efface comptes, favoris et paiements (le back-end doit être démarré)",
+      "type": "shell",
+      "command": "Invoke-RestMethod -Method Post -Uri http://127.0.0.1:3001/api/dev/reset",
+      "osx": { "command": "curl -s -X POST http://127.0.0.1:3001/api/dev/reset" },
+      "linux": { "command": "curl -s -X POST http://127.0.0.1:3001/api/dev/reset" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Boîte mail simulée : derniers emails",
+      "detail": "Codes de confirmation, confirmations de paiement, rappels J-2",
+      "type": "shell",
+      "command": "Invoke-RestMethod -Uri http://127.0.0.1:3001/api/dev/mailbox | Select-Object -First 10 to, subject, code, at | Format-Table -AutoSize",
+      "osx": { "command": "curl -s http://127.0.0.1:3001/api/dev/mailbox" },
+      "linux": { "command": "curl -s http://127.0.0.1:3001/api/dev/mailbox" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Front : build (mode api)",
+      "type": "shell",
+      "command": "npm run build:api",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Front : lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  // Interpréteur Python du back-end simulé (créé par scripts/setup.ps1)
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": false,
+
+  // Tests Python : panneau « Tests » (bécher)
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}/backend",
+  "python.testing.pytestArgs": ["tests"],
+
+  // Style du code : identique à celui du projet (Prettier 2, guillemets simples)
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.singleQuote": true,
+  "prettier.arrowParens": "avoid",
+  "prettier.trailingComma": "es5",
+  "prettier.endOfLine": "auto",
+  "[python]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false
+  },
+  "eslint.validate": ["javascript", "javascriptreact"],
+
+  "files.eol": "auto",
+  "files.encoding": "utf8",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "build": true,
+    "backend/.venv": true,
+    "backend/data": true,
+    "playwright-report": true,
+    "test-results": true
+  },
+
+  // Terminal intégré : PowerShell sous Windows
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+  // Requêtes de backend/api.http (extension REST Client)
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "base": "http://127.0.0.1:3001"
+    }
+  }
+}

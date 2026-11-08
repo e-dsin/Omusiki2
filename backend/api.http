@@ -1,0 +1,124 @@
+# backend/api.http — requêtes prêtes à l'emploi pour l'API simulée (extension VS Code « REST Client »)
+# Cliquer sur « Send Request » au-dessus de chaque requête. Le back-end doit être démarré.
+# Documentation interactive équivalente : http://127.0.0.1:3001/docs
+
+@base = http://127.0.0.1:3001
+@email = awa@omusiki.test
+@password = Secret123
+
+### Santé du serveur
+GET {{base}}/api/health
+
+### 1. Inscription (un code à 6 chiffres est « envoyé » dans la boîte mail simulée)
+POST {{base}}/api/auth/signup
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}", "name": "Awa" }
+
+### 2. Boîte mail simulée : lire le code
+GET {{base}}/api/dev/mailbox?to={{email}}
+
+### 3. Confirmation (remplacer 000000 par le code lu ci-dessus)
+POST {{base}}/api/auth/confirm
+Content-Type: application/json
+
+{ "email": "{{email}}", "code": "000000" }
+
+### 4. Connexion — les requêtes suivantes réutilisent le jeton obtenu
+# @name login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}" }
+
+###
+@token = {{login.response.body.accessToken}}
+
+### Mon compte et mon abonnement
+GET {{base}}/api/me
+Authorization: Bearer {{token}}
+
+### Formules (tarifs fictifs)
+GET {{base}}/api/plans
+
+### Paiement carte : création de la session Checkout (ouvrir ensuite {{base}} + url dans le navigateur)
+POST {{base}}/api/checkout/stripe
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "planId": "premium_mensuel" }
+
+### Paiement mobile money (numéro finissant par 0000 = refus simulé)
+# @name afta
+POST {{base}}/api/payments/aftawallet
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "planId": "pass_30j", "phone": "677123456", "operator": "MTN" }
+
+### Statut du paiement mobile money (validé automatiquement après OMUSIKI_AFTA_DELAY secondes)
+GET {{base}}/api/payments/{{afta.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Webhook Aftawallet simulé (validation immédiate)
+POST {{base}}/api/webhooks/aftawallet
+X-Afta-Signature: simulated
+Content-Type: application/json
+
+{ "payment_id": "{{afta.response.body.id}}", "status": "SUCCESSFUL" }
+
+### Historique des paiements
+GET {{base}}/api/me/payments
+Authorization: Bearer {{token}}
+
+### Résilier / reprendre l'abonnement carte
+POST {{base}}/api/me/subscription/cancel
+Authorization: Bearer {{token}}
+
+###
+POST {{base}}/api/me/subscription/resume
+Authorization: Bearer {{token}}
+
+### Favoris
+PUT {{base}}/api/me/favorites/cmr_makossa_001
+Authorization: Bearer {{token}}
+
+###
+GET {{base}}/api/me/favorites
+Authorization: Bearer {{token}}
+
+### Écoute (comptée à partir de 30 s)
+POST {{base}}/api/plays
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "trackId": "cmr_makossa_001", "seconds": 45 }
+
+### --- Outils de test ---------------------------------------------------------
+
+### Faire expirer l'accès (pass) ou déclencher un renouvellement (carte)
+POST {{base}}/api/dev/users/{{email}}/subscription/expire
+
+### Rapprocher l'échéance à 1 jour, puis envoyer les rappels J-2
+POST {{base}}/api/dev/users/{{email}}/subscription/ends-in
+Content-Type: application/json
+
+{ "days": 1 }
+
+###
+POST {{base}}/api/dev/reminders/run
+
+### Réseau dégradé : 800 ms de latence et 20 % d'erreurs 503
+PUT {{base}}/api/dev/settings
+Content-Type: application/json
+
+{ "latencyMs": 800, "failRate": 0.2 }
+
+### Réseau normal
+PUT {{base}}/api/dev/settings
+Content-Type: application/json
+
+{ "latencyMs": 0, "failRate": 0 }
+
+### Tout effacer (comptes, favoris, paiements)
+POST {{base}}/api/dev/reset

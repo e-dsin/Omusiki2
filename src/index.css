@@ -1,0 +1,75 @@
+/* La police Montserrat est chargée une seule fois, dans index.html */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hauteur de la barre d'onglets mobile : utilisée par le layout et le mini-lecteur */
+:root {
+  --om-bottom-nav-h: 0px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --om-bottom-nav-h: 64px;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #0a0a0a;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Affichage conditionnel bureau / mobile (seuil 768 px) */
+.om-mobile-only {
+  display: none;
+}
+
+.om-desktop-only {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .om-mobile-only {
+    display: flex;
+  }
+
+  .om-desktop-only {
+    display: none;
+  }
+}
+
+/* Animation partagée par les indicateurs de chargement */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.om-spin {
+  animation: spin 1s linear infinite;
+}

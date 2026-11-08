@@ -1,0 +1,23 @@
+# Dépendances et builds
+node_modules/
+build/
+dist/
+
+# Variables locales (ne jamais versionner de secrets)
+.env.local
+.env.*.local
+
+# Back-end simulé
+backend/.venv/
+backend/data/
+__pycache__/
+.pytest_cache/
+*.db
+
+# Tests de bout en bout
+test-results/
+playwright-report/
+
+# Éditeurs / système
+.DS_Store
+Thumbs.db

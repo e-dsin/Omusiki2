@@ -1,0 +1,62 @@
+{
+  // Débogage Ô musiki — panneau « Exécuter et déboguer » (Ctrl+Maj+D)
+  // « Pile complète » lance le back-end sous le débogueur Python et le front dans Chrome (ou Edge).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Back-end : déboguer (uvicorn)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--host", "127.0.0.1", "--port", "3001"],
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+      "osx": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+      "linux": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+      "env": { "OMUSIKI_AFTA_DELAY": "6" },
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Back-end : déboguer les tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-x"],
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+      "osx": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+      "linux": { "python": "${workspaceFolder}/backend/.venv/bin/python" },
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Front : déboguer dans Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:3000",
+      "webRoot": "${workspaceFolder}/src",
+      "preLaunchTask": "Front : démarrer (mode api)"
+    },
+    {
+      "name": "Front : déboguer dans Edge",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://127.0.0.1:3000",
+      "webRoot": "${workspaceFolder}/src",
+      "preLaunchTask": "Front : démarrer (mode api)"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Pile complète : back + front (débogage)",
+      "configurations": ["Back-end : déboguer (uvicorn)", "Front : déboguer dans Chrome"],
+      "stopAll": true
+    },
+    {
+      "name": "Pile complète : back + front (Edge)",
+      "configurations": ["Back-end : déboguer (uvicorn)", "Front : déboguer dans Edge"],
+      "stopAll": true
+    }
+  ]
+}

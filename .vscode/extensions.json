@@ -1,0 +1,12 @@
+{
+  // Extensions recommandées : VS Code les propose à l'ouverture du dossier
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.debugpy",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-playwright.playwright",
+    "humao.rest-client"
+  ]
+}

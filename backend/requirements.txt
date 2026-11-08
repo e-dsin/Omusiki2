@@ -1,0 +1,11 @@
+# Back-end simulé Ô musiki — Python 3.11 à 3.13
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+PyJWT==2.15.1
+bcrypt==5.0.0
+json5==0.17.3
+python-multipart==0.0.33
+
+# Tests
+pytest==9.2.0
+httpx==0.28.1
